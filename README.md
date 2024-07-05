@@ -5,5 +5,4 @@ Permet d'extraire des données à partir d'un CSV
 
 Application permettant de manipuler un fichier CSV.
 
-Entrée CSV
-Sortie CSV modifié (Choix de colonne, Ordre des colonnes)
+Entrée CSV => Sortie CSV modifié (Choix de colonne, Ordre des colonnes)
