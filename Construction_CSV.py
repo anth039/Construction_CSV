@@ -10,6 +10,7 @@ import time
 #Variable globale
 fichierOriginePremiereLigne = ""
 fichierOrigineSecondeLigne = ""
+listeRecherche = []
 
 #Permet de choisir un fichier d'origine
 def onClickFichierOrigine():
@@ -59,6 +60,8 @@ def onClickDossierDestination():
 
 #Permet d'ajouter des colonnes au fichier de destination
 def doubleClickChoixOrigine(event):
+    global listeRecherche
+
     #Récupération de la position du curseur
     choix = listeChoixOrigine.curselection() 
 
@@ -66,14 +69,23 @@ def doubleClickChoixOrigine(event):
         #Ajout dans la colonne destination
         listeChoixDestination.insert(0, listeChoixOrigine.get(choix))
         
+        #Mise à jour de la liste de recherche
+        listeRecherche.remove(listeChoixOrigine.get(choix))
+        
         #Enlève dans la colonne d'origine
         listeChoixOrigine.delete(choix)
         
         #Blocage de la position du délimiteurs
         monComboboxDelimiteurs.configure(state="disabled")
+        
+        #Mise à jour de la recherche
+        recherche('key')
+
     
 #Permet d'enlever des colonnes au fichier de destination
 def doubleClickChoixDestination(event):
+    global listeRecherche
+
     #Récupération de la position du curseur
     choix = listeChoixDestination.curselection() 
 
@@ -90,6 +102,12 @@ def doubleClickChoixDestination(event):
         #Réinsertion des élements triés
         for item in sorted(items,reverse = True):
            listeChoixOrigine.insert(0,item)
+                
+        #Mise à jour de la liste de recherche
+        listeRecherche.append(listeChoixDestination.get(choix))
+        
+        #Mise à jour de la recherche
+        recherche('key')
         
         #Enlève dans la colonne d'origine
         listeChoixDestination.delete(choix)
@@ -155,7 +173,7 @@ def choixDelimiteur(event):
     listeChoixOrigine.delete(0,'end')
     
     #Récupération de la première ligne extraite
-    global fichierOriginePremiereLigne,fichierOrigineSecondeLigne
+    global fichierOriginePremiereLigne,fichierOrigineSecondeLigne,listeRecherche
     
     #Récupération du choix
     choix = monComboboxDelimiteurs.get()
@@ -174,8 +192,24 @@ def choixDelimiteur(event):
           for element in sorted(fichierOriginePremiereLigne.split(choix)):
              listeChoixOrigine.insert(i, element + " => "+ elementsSecondeLigne[i] )
              i+=1
+             #Récupération de la liste
+             
+          #Récupération des élements de la liste
+          listeRecherche = list(listeChoixOrigine.get('@1,0', END))
        else:
           listeChoixOrigine.insert(0, fichierOriginePremiereLigne)
+
+def recherche(event):
+   global listeRecherche
+      
+   #Vidange de la liste d'origine
+   listeChoixOrigine.delete(0,'end')
+   
+   #Remplissage avec filtre
+   for item in sorted(listeRecherche,reverse = True):
+      if maRecherche.get() in item:
+         listeChoixOrigine.insert(0,item)
+
 
 #**********Programme principal
 if __name__ == '__main__':
@@ -232,7 +266,11 @@ if __name__ == '__main__':
     listeChoixDestination = Listbox(monConteneurSecondaire,width=45)
     listeChoixDestination.bind('<Double-Button>', doubleClickChoixDestination)
     listeChoixDestination.grid(column=2,row=1)
+    maRecherche = Entry(monConteneurSecondaire,width=40)
+    maRecherche.bind("<Key>", recherche)
+    maRecherche.grid(column=0, row=2)
     monConteneurSecondaire.grid(column=0, row=3,columnspan=3,pady=5)
+   
     
     #Extraction
     monBoutonExtraction = Button(monConteneurPrincipal, text="Exportation", command=onClickExport)
