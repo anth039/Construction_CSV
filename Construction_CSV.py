@@ -81,6 +81,16 @@ def doubleClickChoixDestination(event):
         #Ajout dans la colonne destination
         listeChoixOrigine.insert(0, listeChoixDestination.get(choix))
         
+        #Récupération des élements de la liste
+        items = listeChoixOrigine.get('@1,0', END)
+        
+        #Suppression de la liste
+        listeChoixOrigine.delete(0,'end')
+        
+        #Réinsertion des élements triés
+        for item in sorted(items,reverse = True):
+           listeChoixOrigine.insert(0,item)
+        
         #Enlève dans la colonne d'origine
         listeChoixDestination.delete(choix)
         
@@ -161,7 +171,7 @@ def choixDelimiteur(event):
           elementsSecondeLigne = fichierOrigineSecondeLigne.split(choix)
        
           i = 0
-          for element in fichierOriginePremiereLigne.split(choix):
+          for element in sorted(fichierOriginePremiereLigne.split(choix)):
              listeChoixOrigine.insert(i, element + " => "+ elementsSecondeLigne[i] )
              i+=1
        else:
